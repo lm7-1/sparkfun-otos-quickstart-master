@@ -5,6 +5,13 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import com.acmerobotics.dashboard.FtcDashboard;
+import com.acmerobotics.dashboard.canvas.Canvas;
+import com.acmerobotics.dashboard.telemetry.TelemetryPacket;
+import com.acmerobotics.roadrunner.Pose2d;
+import com.acmerobotics.roadrunner.Vector2d;
+
+
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.DistanceUnit;
@@ -16,14 +23,25 @@ public class OtosTest extends LinearOpMode {
     IMU imu;
     ElapsedTime timer = new ElapsedTime();
     static final double max_speed = .5;
+    private boolean usedashboard=true;
+    private FtcDashboard dashboard;
+    private TelemetryPacket packet;
+    private Canvas fieldOverlay;
+
+
+
 
     @Override
     public void runOpMode() throws InterruptedException {
         // Get a reference to the sensor
         myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
-
+        SparkFunOTOSDrive(hardwareMap.)
         // All the configuration for the OTOS is done in this helper method, check it out!
         configureOtos();
+        if (usedashboard) {
+            dashboard = FtcDashboard.getInstance();
+            dashboard.setTelemetryTransmissionInterval(25);
+        }
 
         // Wait for the start button to be pressed
         waitForStart();
