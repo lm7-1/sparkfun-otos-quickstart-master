@@ -35,7 +35,7 @@ public class OtosTest extends LinearOpMode {
     public void runOpMode() throws InterruptedException {
         // Get a reference to the sensor
         myOtos = hardwareMap.get(SparkFunOTOS.class, "sensor_otos");
-        SparkFunOTOSDrive(hardwareMap.)
+        //SparkFunOTOSDrive(hardwareMap.get())
         // All the configuration for the OTOS is done in this helper method, check it out!
         configureOtos();
         if (usedashboard) {
