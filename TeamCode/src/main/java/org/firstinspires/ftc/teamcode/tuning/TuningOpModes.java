@@ -17,6 +17,7 @@ import com.acmerobotics.roadrunner.ftc.LateralRampLogger;
 import com.acmerobotics.roadrunner.ftc.ManualFeedforwardTuner;
 import com.acmerobotics.roadrunner.ftc.MecanumMotorDirectionDebugger;
 import com.acmerobotics.roadrunner.ftc.OtosEncoder;
+import com.acmerobotics.roadrunner.ftc.PinpointEncoder;
 import com.qualcomm.hardware.lynx.LynxModule;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.OpModeManager;
@@ -24,6 +25,7 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.firstinspires.ftc.teamcode.MecanumDrive;
+import org.firstinspires.ftc.teamcode.PinpointDrive;
 import org.firstinspires.ftc.teamcode.SparkFunOTOSDrive;
 import org.firstinspires.ftc.teamcode.TankDrive;
 import org.firstinspires.ftc.teamcode.ThreeDeadWheelLocalizer;
@@ -34,7 +36,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public final class TuningOpModes {
-    public static final Class<?> DRIVE_CLASS = SparkFunOTOSDrive.class;
+    public static final Class<?> DRIVE_CLASS = PinpointDrive.class;
 
     public static final String GROUP = "quickstart";
     public static final boolean DISABLED = false;
@@ -181,6 +183,41 @@ public final class TuningOpModes {
                         () -> new MotorFeedforward(TankDrive.PARAMS.kS,
                                 TankDrive.PARAMS.kV / TankDrive.PARAMS.inPerTick,
                                 TankDrive.PARAMS.kA / TankDrive.PARAMS.inPerTick)
+                );
+            };
+        } else if (DRIVE_CLASS.equals(PinpointDrive.class)) {
+            dvf = hardwareMap -> {
+                PinpointDrive pd = new PinpointDrive(hardwareMap, new Pose2d(0, 0, 0));
+
+                List<Encoder> leftEncs = new ArrayList<>(), rightEncs = new ArrayList<>();
+                List<Encoder> parEncs = new ArrayList<>(), perpEncs = new ArrayList<>();
+                parEncs.add(new PinpointEncoder(pd.pinpoint,false, pd.leftBack));
+                perpEncs.add(new PinpointEncoder(pd.pinpoint,true, pd.leftBack));
+
+                return new DriveView(
+                        DriveType.MECANUM,
+                        MecanumDrive.PARAMS.inPerTick,
+                        MecanumDrive.PARAMS.maxWheelVel,
+                        MecanumDrive.PARAMS.minProfileAccel,
+                        MecanumDrive.PARAMS.maxProfileAccel,
+                        hardwareMap.getAll(LynxModule.class),
+                        Arrays.asList(
+                                pd.leftFront,
+                                pd.leftBack
+                        ),
+                        Arrays.asList(
+                                pd.rightFront,
+                                pd.rightBack
+                        ),
+                        leftEncs,
+                        rightEncs,
+                        parEncs,
+                        perpEncs,
+                        pd.lazyImu,
+                        pd.voltageSensor,
+                        () -> new MotorFeedforward(MecanumDrive.PARAMS.kS,
+                                MecanumDrive.PARAMS.kV / MecanumDrive.PARAMS.inPerTick,
+                                MecanumDrive.PARAMS.kA / MecanumDrive.PARAMS.inPerTick)
                 );
             };
         } else {

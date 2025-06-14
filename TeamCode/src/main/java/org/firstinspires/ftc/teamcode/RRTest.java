@@ -54,40 +54,32 @@ public class RRTest extends LinearOpMode {
 */
     @Override
     public void runOpMode() {
-        Pose2d initialPose = new Pose2d(11.8, 61.7, Math.toRadians(90));
+        Pose2d initialPose = new Pose2d(0, 0, Math.toRadians(90));
         MecanumDrive drive = new SparkFunOTOSDrive(hardwareMap, initialPose);
         //Claw claw = new Claw(hardwareMap);
-
+        Vector2d basketV = new Vector2d(-48, -40);
+        int basket_angle = 115;
         // vision here that outputs position
         //int visionOutputPosition = 1;
-
-        TrajectoryActionBuilder tab1 = drive.actionBuilder(initialPose)
-                .lineToYSplineHeading(33, Math.toRadians(0))
-                .waitSeconds(2)
+        TrajectoryActionBuilder tab11, tab12, tab13, tab14, tab15, tab16, tab17, tab18;
+        tab11 = drive.actionBuilder(initialPose)
                 .setTangent(Math.toRadians(90))
-                .lineToY(48)
-                .setTangent(Math.toRadians(0))
-                .lineToX(32)
-                .strafeTo(new Vector2d(44.5, 30))
-                .turn(Math.toRadians(180))
-                .lineToX(47.5)
-                .waitSeconds(3);
-        TrajectoryActionBuilder tab2 = drive.actionBuilder(initialPose)
-                .lineToY(37)
-                .setTangent(Math.toRadians(0))
-                .lineToX(18)
-                .waitSeconds(3)
-                .setTangent(Math.toRadians(0))
-                .lineToXSplineHeading(46, Math.toRadians(180))
-                .waitSeconds(3);
-        TrajectoryActionBuilder tab3 = drive.actionBuilder(initialPose)
-                .lineToYSplineHeading(33, Math.toRadians(180))
-                .waitSeconds(2)
-                .strafeTo(new Vector2d(46, 30))
-                .waitSeconds(3);
-        Action trajectoryActionCloseOut = tab1.endTrajectory().fresh()
-                .strafeTo(new Vector2d(48, 12))
-                .build();
+                .lineToY(-35.0); //move to submersible
+        tab12 = tab11.endTrajectory().fresh()
+                .strafeTo(new Vector2d(-48, -40)); //move to sample 1
+        tab13 = tab12.endTrajectory().fresh()
+                .strafeToSplineHeading(basketV,Math.toRadians(basket_angle));
+        tab14 = tab13.endTrajectory().fresh()
+                .strafeToSplineHeading(basketV,Math.toRadians(basket_angle)); //move to basket
+        tab15 = tab14.endTrajectory().fresh()
+                .turnTo(Math.toRadians(115)); // turn to sample 3
+        tab16 = tab15.endTrajectory().fresh()
+                .turnTo(Math.toRadians(basket_angle)); // turn to basket
+        tab17 = tab16.endTrajectory().fresh()
+                .strafeToSplineHeading(new Vector2d(-35, -11), Math.toRadians(0))
+                .strafeTo(new Vector2d(-30, -11));
+        tab18 = tab17.endTrajectory().fresh()
+            .strafeTo(new Vector2d(48, 12));
 
         // actions that need to happen on init; for instance, a claw tightening.
         //Actions.runBlocking(claw.closeClaw());
@@ -103,20 +95,20 @@ public class RRTest extends LinearOpMode {
 
         Action trajectoryActionChosen;
         if (startPosition == 1) {
-            trajectoryActionChosen = tab1.build();
+            trajectoryActionChosen = tab11.build();
         } else if (startPosition == 2) {
-            trajectoryActionChosen = tab2.build();
+            trajectoryActionChosen = tab11.build();
         } else {
-            trajectoryActionChosen = tab3.build();
+            trajectoryActionChosen = tab11.build();
         }
 
         Actions.runBlocking(
                 new SequentialAction(
-                        trajectoryActionChosen,
+                        trajectoryActionChosen
 
                         //claw.openClaw(),
 
-                        trajectoryActionCloseOut
+                        //trajectoryActionCloseOut
                 )
         );
     }
